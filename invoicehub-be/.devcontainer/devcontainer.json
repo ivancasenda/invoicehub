@@ -1,0 +1,29 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "gabrielbb.vscode-lombok",
+                "redhat.java",
+                "redhat.fabric8-analytics",
+                "redhat.vscode-xml",
+                "pivotal.vscode-boot-dev-pack"
+            ]
+        }
+    },
+    "runArgs": [
+        "-it",
+        "--rm"
+    ],
+    "forwardPorts": [
+        8888
+    ],
+    "mounts": [
+        "source=${localWorkspaceFolder}/../maven_cache,target=/home/maven/.m2,type=bind,consistency=delegated"
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/maven/invoice-backend,type=bind,consistency=delegated",
+    "workspaceFolder": "/home/maven/invoice-backend"
+}

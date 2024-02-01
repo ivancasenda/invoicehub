@@ -1,0 +1,169 @@
+<div class="content" role="main">
+  <p-confirmDialog [baseZIndex]="10000" styleClass="confirm-dialog" acceptLabel="Ya" rejectLabel="Tidak" defaultFocus="reject" 
+  acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary" ></p-confirmDialog>
+  
+  <form *ngIf="invoiceForm" [formGroup]="invoiceForm">
+    <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between p-ai-md-center">
+      <div>
+        <h1>Invoice</h1>
+      </div>
+      
+      <div>
+        <div class="p-field p-d-flex p-ai-center">
+          <label for="date-time" class="label-header p-text-bold">Date</label>
+          <p-calendar inputId="date-time" formControlName="datetime" (onSelect)="disableDateInterval()" (onTodayClick)="updateCurrentDatetime()" dateFormat="dd-M-yy"
+          [touchUI]="isMobile" [showTime]="true" hourFormat="24" [showButtonBar]="true" [showIcon]="true" required tabindex="-1"></p-calendar>
+        </div>
+
+        <div class="p-field p-d-flex p-ai-center">
+          <label for="store-name" class="label-header p-text-bold">Name</label>
+          <input pInputText type="text" formControlName="storeName" id="store-name" maxlength="36" size="25px" tabindex="1"/> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-mt-5">
+      <div class="p-field p-d-flex p-ai-center">
+        <label for="invoice-id" class="label-header p-text-bold">Invoice No.</label>
+        <p-inputMask inputId="invoice-id" formControlName="invoiceID" styleClass="p-text-uppercase" size="25px" mask="aaa-9?999999999999" required ></p-inputMask>
+        
+        <ng-template [ngIf]="(invoiceForm.get('invoiceID').errors?.required || invoiceForm.get('invoiceID').errors?.pattern) && invoiceForm.get('invoiceID').touched">
+          <p-message severity="error" text="Invoice No. Required" class="p-ml-1"></p-message>
+        </ng-template>
+        
+        <ng-template [ngIf]="invoiceForm.get('invoiceID').pending">
+          <i class="pi pi-spin pi-spinner p-ml-3 async-loading"></i>
+        </ng-template>
+        
+        <ng-template [ngIf]="invoiceForm.get('invoiceID').invalid && !invoiceForm.get('invoiceID').errors?.required && !invoiceForm.get('invoiceID').errors?.pattern">
+          <p-message severity="error" text="Invoice No. already exist" class="p-ml-1"></p-message>
+        </ng-template>
+      </div>
+
+    </div>
+    
+    <p-messages [key]="'outOfRangeErrorMessage'" [closable]="false"></p-messages>
+
+    <div *ngIf="isMobile" class="p-text-center">
+      <button pButton pRipple (click)="addRow()" label='Add Line' icon="pi pi-plus" class="p-button-rounded p-button-primary p-m-4" pTooltip="Add Line"></button>
+    </div>
+    
+    <p-table [value]="itemsForm.controls" [rowHover]="!isMobile" [responsive]="true" class="invoice-table">
+        <ng-template pTemplate="header">
+            <tr>
+                <th class="p-text-center add-row">
+                  <button pButton pRipple (click)="addRow()" type="button" icon="pi pi-plus" class="p-button-rounded p-button-primary" pTooltip="Add Line"></button>
+                </th>
+                <th class="kuantitas">Quantity</th>
+                <th class="satuan">Unit</th>
+                <th class="nama-barang">Description</th>
+                <th class="p-text-right harga">Unit Price</th>
+                <th class="p-text-right jumlah">Sub Total</th>
+            </tr>
+        </ng-template>
+       
+        <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+          <ng-container formArrayName="items">  
+            <tr [formGroupName]="rowIndex" [@fadeInOut]>
+                <td class="p-text-center">
+                  <button pButton pRipple (click)="deleteRow(rowIndex, $event.screenY)" icon="pi pi-trash" class="p-button-rounded p-button-warning" pTooltip="Delete Line"></button>
+                </td>
+                
+                <td width="auto">
+                  <span class="p-column-title p-mb-1 mobile-column-title">Quantity</span>
+                  <div class="p-inputgroup">
+                    <input #quantity pInputText formControlName="quantity" (input)="formatInputAndUpdateTotal(rowIndex, quantity.value, price.value, 'quantity', quantity)" maxlength="20" [tabindex]="2 + (rowIndex*3)" />
+                  </div>
+                </td>
+                
+                <td>
+                  <span class="p-column-title p-mb-1 mobile-column-title">Unit</span>
+                  <div class="p-fluid"><input pInputText formControlName="unit" maxlength="36" [tabindex]="3 + (rowIndex*3)" /></div>
+                </td>
+                
+                <td>
+                  <span class="p-column-title p-mb-1 mobile-column-title">Description</span>
+                  <div class="p-fluid"><input pInputText formControlName="itemName" [tabindex]="4 + (rowIndex*3)" /></div>
+                </td>
+                
+                <td>
+                  <span class="p-column-title p-mb-1 mobile-column-title">Unit Price</span>
+                  <div class="p-inputgroup">
+                    <span class="p-inputgroup-addon">Rp.</span>
+                    <input #price pInputText formControlName="price" (input)="formatInputAndUpdateTotal(rowIndex, quantity.value, price.value, 'price', price)"  maxlength="20" size="100%" [tabindex]="5 + (rowIndex*3)" class="p-text-right harga" />
+                  </div>
+                </td>
+                
+                <td>
+                  <span class="p-column-title p-mb-1 mobile-column-title">Total</span>
+                  <div class="p-inputgroup">
+                    <span class="p-inputgroup-addon">Rp.</span>
+                    <input pInputText size="100%" [value]="totalAmount[rowIndex] == null || totalAmount[rowIndex] == 0 ? '' : totalAmount[rowIndex].toLocaleString('id')" class="p-text-right p-text-bold disabled-amount" disabled/>
+                  </div>
+                </td>
+            </tr>
+          </ng-container>
+        </ng-template>
+        
+        <ng-template pTemplate="footer">
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="p-text-right">Total Rp.</td>
+            <td>
+              <div class="p-fluid">
+                <input pInputText [value]="totalPrice == 0 ? '' : totalPrice.toLocaleString('id')" class="p-text-right p-text-bold disabled-amount" disabled/>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+          <tr>
+              <td colspan="6" class="p-text-center empty-message">Tidak ada <span class="p-text-bold">barang</span></td>
+          </tr>
+      </ng-template>
+    </p-table>
+
+    <ng-template [ngIf]="isMobile">
+      <div class="p-m-3">
+        <p class="p-mb-2 p-text-bold">Jumlah Rp.</p>
+        <div class="p-fluid">
+          <input pInputText [value]="totalPrice == 0 ? '' : totalPrice.toLocaleString('id')" class="p-text-right p-text-bold disabled-amount" disabled/>
+        </div>
+      </div>
+    </ng-template>
+    
+    <div class="p-d-flex p-jc-between invoice-footer invoice-operations">
+      <div class="p-d-flex p-jc-between">
+        <p class="p-mr-2">Notes:</p>
+        <textarea pInputText formControlName="invoiceNote" id="invoice-note" rows='4' cols='25' maxlength="355"></textarea>
+      </div>
+
+      <ng-template [ngIf]="!isMobile">
+        <div *ngIf="idParam == null" class="p-d-flex p-ai-center p-ml-1 p-mr-2"><p-splitButton (onClick)="saveAndPrint()" [label]="isMobile ? '' : 'Save & Print'" [model]="items" [disabled]="invoiceForm.invalid || invoiceForm.pending || outOfRangeError" icon="pi pi-save" styleClass="p-button-info"></p-splitButton></div>
+
+        <ng-template [ngIf]="idParam != null">
+          <div class="p-d-flex p-ai-center p-ml-2 p-mr-2"><p-splitButton (onClick)="updateAndPrint()" [label]="isMobile ? '' : 'Update & Print'" [model]="items" [disabled]="invoiceForm.invalid || invoiceForm.pending || outOfRangeError" icon="pi pi-save" styleClass="p-button-info"></p-splitButton></div>
+          
+          <div class="p-d-flex p-ai-center p-mr-4"><button pButton pRipple type="button" (click)="deleteInvoice()" label="Delete" class="p-button-danger"  icon="pi pi-trash"></button></div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <div *ngIf="isMobile" class="p-d-flex p-jc-center invoice-operations">
+      <button *ngIf="idParam == null" pButton pRipple type="button" (click)="saveInvoice()" [disabled]="invoiceForm.invalid || invoiceForm.pending || outOfRangeError" label="Save" class="p-button-info p-mt-3 p-mr-4"  icon="pi pi-save"></button>
+      
+      <button *ngIf="idParam != null" pButton pRipple type="button" (click)="updateInvoice()" [disabled]="invoiceForm.invalid || invoiceForm.pending || outOfRangeError" label="Update" class="p-button-info p-mt-3 p-mr-4"  icon="pi pi-save"></button>
+
+      <button pButton pRipple type="button" (click)="printInvoice()" [disabled]="invoiceForm.invalid || invoiceForm.pending || outOfRangeError" label="Print" class="p-button-info p-mt-3 p-mr-4"  icon="pi pi-print"></button>
+      
+      <ng-template [ngIf]="idParam != null">
+        <button pButton pRipple type="button" (click)="deleteInvoice()" label="Delete" class="p-button-danger p-mt-3"  icon="pi pi-trash"></button>
+      </ng-template>
+    </div>
+  </form>
+</div>
+

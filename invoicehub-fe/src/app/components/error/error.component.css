@@ -1,0 +1,27 @@
+.content {
+    margin-top: 60px; 
+    padding: 0 16px;
+
+    background-image: url("src/assets/404-background.jpg");
+
+    height: 100%;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#container {
+    position: absolute;
+    top: 0%;
+    left: 10%;
+    right: 10%;
+    bottom: 10%;
+    display: flex;
+    align-items: center;
+}
+
+#container .info h1 {
+    margin: 0px;
+    font-size: 5vw;
+}

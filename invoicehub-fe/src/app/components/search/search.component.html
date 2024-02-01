@@ -1,0 +1,110 @@
+<div class="content" role="main">
+  <p-toast key="searchMessage"></p-toast>
+  <p-confirmDialog [baseZIndex]="10000" styleClass="confirm-dialog" acceptLabel="Yes" rejectLabel="Cancel" defaultFocus="reject" 
+  acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary" ></p-confirmDialog>
+  
+  <p-table #dt [value]="searchResult | async" (onLazyLoad)="loadInvoice($event)" [lazy]="true" [paginator]="true" [rows]="10" [totalRecords]="totalRecords | async" sortField="datetime" [sortOrder]="1"
+  [responsive]="true" [loading]="loading" [showLoader]="true" [filterDelay]="FILTER_DELAY" [rowsPerPageOptions]="[5,10,25,50]" [rowTrackBy]="trackItemById"
+  currentPageReportTemplate="Showing {first} - {last} invoice from total {totalRecords} found." [showCurrentPageReport]="true" [rowHover]="true" dataKey="id" class="p-mt-2">
+    <ng-template pTemplate="caption">
+        <div class="p-d-flex p-ai-center p-jc-between p-ml-1">
+            <div class="p-d-flex p-ai-center">
+                <p-button icon="pi pi-refresh" (onClick)="refresh()" class="p-mr-3"></p-button>
+                <h2 class="p-m-0 search-table-title">Invoices</h2>
+            </div>
+            
+            <span class="p-input-icon-right p-mr-1">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="searchInput($event.target.value, 'global')" class="p-text-uppercase" placeholder="Find..." />
+            </span>
+        </div>
+    </ng-template>
+      
+    <ng-template pTemplate="header">
+      <tr>
+        <th (click)="sortToggle('invoiceID')" class="sort-button">
+          <div [ngClass]="{'p-d-flex': true, 'p-ai-center': true, 'sort-color': sortField == 'invoiceID' && sortOrder != 0}">
+            <span class="p-ml-1">Invoice No.</span>
+            <i [ngClass]="{'pi p-ml-3': true, 'pi-sort-alt': sortField != 'invoiceID' || (sortField =='invoiceID' && sortOrder == 0), 
+                'pi-sort-alpha-down-alt':sortField == 'invoiceID' && sortOrder == 1, 'pi-sort-alpha-up-alt': sortField == 'invoiceID' && sortOrder == 2}" class="sort-icon"></i>
+          </div>
+        </th>
+          
+        <th (click)="sortToggle('storeName')" class="sort-button">
+          <div [ngClass]="{'p-d-flex': true, 'p-ai-center': true, 'sort-color': sortField == 'storeName' && sortOrder != 0}">
+            <span class="p-ml-1">Name</span>
+            <i [ngClass]="{'pi p-ml-3': true, 'pi-sort-alt': sortField != 'storeName' || (sortField =='storeName' && sortOrder == 0), 
+                'pi-sort-alpha-down-alt':sortField == 'storeName' && sortOrder == 1, 'pi-sort-alpha-up-alt': sortField == 'storeName' && sortOrder == 2}" class="sort-icon"></i>
+          </div>
+        </th>
+        
+        <th class="sort-button" (click)="sortToggle('datetime')">
+          <div [ngClass]="{'p-d-flex': true, 'p-ai-center': true, 'sort-color': sortField == 'datetime' && sortOrder != 0}">
+            <span class="p-ml-1">Date</span>
+            <i [ngClass]="{'pi p-ml-3': true, 'pi-sort-alt': sortField != 'datetime' || (sortField =='datetime' && sortOrder == 0), 
+                'pi-sort-amount-down-alt':sortField == 'datetime' && sortOrder == 1, 'pi-sort-amount-up-alt': sortField == 'datetime' && sortOrder == 2}" class="sort-icon"></i>
+          </div>
+        </th>
+        
+        <th></th>
+      </tr>
+    
+      <tr>
+        <th>
+          <div class="p-fluid">
+            <span class="p-input-icon-right">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="searchInput($event.target.value, 'invoiceID')" placeholder="Find Invoice No." class="p-column-filter p-text-uppercase">
+            </span>
+          </div>
+        </th>
+        
+        <th>
+          <div class="p-fluid">
+            <span class="p-input-icon-right">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="searchInput($event.target.value, 'storeName')" placeholder="Find Name" class="p-column-filter p-text-uppercase">
+            </span>
+          </div>
+        </th>
+        
+        <th class="p-text-center"> 
+          <div class="p-d-flex">
+            <p-calendar inputId="date-time1" (onSelect)="dt.filter($event, 'datetimeFrom')" [touchUI]="true" dateFormat="dd-M-yy" class="p-column-filter p-mr-1"
+            [showTime]="false" hourFormat="24" [showIcon]="true" [showButtonBar]="true" placeholder="From" styleClass="search-calendar" ></p-calendar>
+            
+            <p-calendar inputId="date-time2" (onSelect)="dt.filter($event, 'datetimeTo')" [touchUI]="true" dateFormat="dd-M-yy" class="p-column-filter"
+            [showTime]="false" hourFormat="24" [showIcon]="true" [showButtonBar]="true" placeholder="Until" styleClass="search-calendar"></p-calendar>
+          </div>
+        </th>
+        
+        <th></th>
+      </tr>
+  </ng-template>
+  
+  <ng-template #tableBody pTemplate="body" let-invoice>
+    <tr [@fadeInOut]>
+      <td><span class="p-column-title">Invoice No.</span><span class="p-text-uppercase p-ml-2">{{invoice.invoiceID}}</span></td>
+      
+      <td><span class="p-column-title">Name</span><span class="p-ml-2">{{invoice.storeName}}</span></td>
+      
+      <td><span class="p-column-title">Date</span><span class="p-ml-2">{{(invoice.datetime + 'Z') | date:'d MMM y HH:mm':null:'id-ID'}}</span></td>
+      
+      <td class="p-text-center">
+        <a routerLink="/invoice/id/{{invoice.id}}" routerLinkActive="active">
+            <button pButton pRipple type="button" label="Open" icon="pi pi-eye" class="p-button-raised p-button-info p-mr-2 p-mb-sm-2"></button>
+        </a>
+        <button pButton pRipple type="button" (click)="deleteInvoice(invoice.id, invoice.invoiceID)" label="Delete" icon="pi pi-trash" class="p-button-raised p-button-danger p-mb-sm-2"></button>
+      </td>
+    </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="p-text-center">No <span class="p-text-bold">invoice</span> found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
