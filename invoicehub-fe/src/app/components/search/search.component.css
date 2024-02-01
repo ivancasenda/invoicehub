@@ -1,0 +1,64 @@
+a {
+  text-decoration: none;
+}
+
+::placeholder {
+  /* Recent browsers */
+  text-transform: none;
+}
+
+.content {
+  margin-top: 88px;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 0 16px;
+  margin-bottom: 30px;
+}
+
+.sort-icon {
+  font-size: 1rem;
+}
+
+.sort-button:hover {
+  background-color: rgba(0, 255, 255, 0.342);
+  cursor: pointer;
+}
+
+.sort-color {
+  color: rgb(76, 0, 255);
+}
+
+:host ::ng-deep .searh-calendar {
+  width: 11.5vw;
+}
+
+:host ::ng-deep .p-datatable-loading-overlay {
+  background-color: rgba(128, 150, 115, 0);
+}
+
+:host ::ng-deep .p-datatable-loading-icon {
+  position: absolute;
+  top: 75px;
+  right: 20px;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-current {
+  margin-left: auto;
+}
+
+@media screen and (max-width: 600px) {
+  .search-table-title {
+    display: none;
+  }
+
+  :host ::ng-deep .confirm-dialog {
+    width: 80vw;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  :host ::ng-deep .confirm-dialog {
+    width: 50vw;
+  }
+}

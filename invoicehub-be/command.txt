@@ -1,0 +1,3 @@
+mvn spring-boot:run
+mvn clean package -P prod -DskipTests
+mvn package -P dev

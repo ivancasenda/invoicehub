@@ -1,0 +1,47 @@
+#global config
+---
+spring:
+  profiles:
+    active: @activatedProperties@
+
+  jpa:
+    open-in-view: false #hibernate lazy loading not manage by spring mvc.
+    properties:
+      hibernate:
+        search:
+          '[lucene_version]': LATEST
+
+hibernate:
+  search:
+    default:
+      directory_provider: filesystem
+
+logging:
+  file:
+    path: ./logs
+
+#prod config
+---
+spring:
+  profiles: prod
+  jpa:
+    hibernate:
+      ddl-auto: update #create schema if not exist and update database data if schema exist.
+
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/nota"  
+    username: invoice_user
+    password: invoice_password
+
+#dev config 
+---
+spring:
+  profiles: dev
+  jpa:
+    show-sql: false
+
+server:
+  port: 8080
+  

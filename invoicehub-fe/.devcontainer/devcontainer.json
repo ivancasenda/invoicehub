@@ -1,0 +1,22 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "visualstudioexptteam.vscodeintellicode",
+                "angular.ng-template"
+            ]
+        }
+    },
+    "runArgs": [
+        "-it",
+        "--rm"
+    ],
+    "forwardPorts": [
+        4200
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/node/invoice-frontend,type=bind,consistency=delegated",
+    "workspaceFolder": "/home/node/invoice-frontend"
+}

@@ -1,0 +1,12 @@
+{"properties": [
+    {
+      "name": "hibernate.search.default.directory_provider",
+      "type": "java.lang.String",
+      "description": "Specify Lucene directory provider"
+    },
+    {
+      "name": "hibernate.search.default.indexBase",
+      "type": "java.lang.String",
+      "description": "Specify where Lucene should store the index."
+    }
+  ]}
